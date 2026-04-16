@@ -19,3 +19,11 @@ In an early iteration, the AI suggested using `innerHTML` to display the AI-extr
 - **Semantic Grouping**: Move from string-based normalization to vector-based clustering (using PGVector) for even better grouping across languages.
 - **Admin Dashboard**: A restricted UI for bulk actions and training the grouping model.
 - **Observability**: Integrate Prometheus metrics for the background worker to monitor queue depth and model latency.
+
+## 6. Security Hardening (Phase 2)
+In the hardening phase, we implemented a multi-layered security approach:
+- **Prompt Injection Defense**: Developed a structured bounding system for user content within prompts to prevent "jailbreaking".
+- **Input Pre-validation**: Added a "suspicious pattern" detector that flags common injection keywords for auditing without blocking valid (if aggressive) user feedback.
+- **Output Sanitization**: Implemented a post-processing layer to scrub leaked internal instructions from AI responses before parsing.
+- **Schema Tightening**: Reduced character limits and array sizes in Zod schemas to mitigate resource exhaustion attacks.
+- **Defensive Rendering Verification**: Audited the frontend to ensure no raw model output is ever rendered via `innerHTML`.

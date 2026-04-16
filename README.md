@@ -61,9 +61,32 @@ End-to-end Unicode support is baked into every layer:
 - **AI**: System prompts structured to support multilingual data extraction.
 Verified with Hebrew, Arabic, Japanese, Russian, Hindi, and Emojis.
 
-### Security
-- **Data vs Instructions**: The AI prompt uses explicit boundaries and system instructions to treat feedback as data, mitigating prompt injection.
-- **XSS**: Safe frontend rendering via `textContent` ensures that even if feedback contains `<script>` tags, they are displayed as text and never executed.
+### AI Security Guardrails
+
+This application implements several layers of security to mitigate common AI-related risks, specifically focusing on Prompt Injection and Unsafe Output.
+
+### Key Threats Addressed
+1.  **Prompt Injection**: Malicious users attempting to hijack the LLM core instructions (e.g., "Ignore previous instructions").
+2.  **Unsafe Output**: The model potentially returning malformed JSON or leaking internal instructions.
+3.  **Resource Abuse**: Handling excessively long or complex inputs that could tie up resources.
+4.  **XSS & Payload Injection**: Ensuring adversarial payloads (HTML/JS) are treated as data and rendered safely.
+
+### Mitigations
+- **Structured Prompt Delimiters**: User content is wrapped in explicit `================` delimiters with strict instructions to treat the enclosed text as untrusted data only.
+- **Input Pre-validation**: A lightweight security utility scans for common injection patterns and logs them for auditing.
+- **Strict Output Schema**: A Zod schema enforces the structure of the AI's response. Any deviation (missing fields, wrong types) triggers a failure/retry flow.
+- **Output Sanitization**: The raw AI response is sanitized to remove any leaked internal tokens or suspicious HTML markers before being parsed or stored.
+- **Least Privilege Architecture**: The LLM is used strictly for stateless analysis. It has no access to the database or system commands.
+- **Safe Frontend Rendering**: All user-submitted and AI-generated content is rendered using `textContent` to prevent XSS.
+
+### Limitations
+- **Cat-and-Mouse Game**: Prompt injection is an evolving field; no static detection pattern is 100% effective against sophisticated obfuscation.
+- **Model-Specific Behavior**: Different LLMs may have varying levels of instruction-following consistency.
+
+### Why User Text is Untrusted
+In this system, we treat user feedback as **pure data**. We never allow the model to make security-critical decisions without application-layer validation, and we ensure the model's output is treated as untrusted until it passes schema validation and sanitization.
+
+**For a deep dive into the security architecture, see [docs/security_review.md](./docs/security_review.md).**
 
 ## API Summary
 - `POST /feedback`: Submit new feedback.
