@@ -14,15 +14,8 @@ export async function buildApp() {
   // Register plugins
   await app.register(fastifyStatic, {
     root: config.publicDir,
-    prefix: '/public/', // Optional, files can also be served by pageRoutes
-    serve: false, // We'll serve explicitly via pageRoutes or fallback
-  });
-
-  // Re-configure static for direct file serving if needed, 
-  // but we already have routes in pageRoutes. 
-  // Let's make it simple:
-  app.register(fastifyStatic, {
-    root: config.publicDir,
+    // Enable this to serve files directly from root (e.g. /index.html)
+    // while also allowing manual sendFile usage in routes.
     decorateReply: true,
   });
 
