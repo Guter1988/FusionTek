@@ -1,20 +1,22 @@
 import { buildApp } from './app.js';
 import { config } from './config.js';
-import { startWorker } from './worker.js';
+import { FeedbackWorker } from './worker/feedbackWorker.js';
 
-async function start() {
-  const app = await buildApp();
-
+const start = async () => {
   try {
-    await app.listen({ port: config.port, host: '0.0.0.0' });
-    console.log(`Server listening at http://localhost:${config.port}`);
+    const app = await buildApp();
     
-    // Start background worker
-    startWorker();
+    // Start Background Worker
+    const worker = new FeedbackWorker();
+    worker.start();
+    console.log('Background worker started');
+
+    await app.listen({ port: config.port, host: '0.0.0.0' });
+    console.log(`Server listening on http://localhost:${config.port}`);
   } catch (err) {
-    app.log.error(err);
+    console.error('Error starting server:', err);
     process.exit(1);
   }
-}
+};
 
 start();

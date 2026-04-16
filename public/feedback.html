@@ -4,251 +4,152 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Feedback Details | FusionTek</title>
-    <meta name="description" content="View detailed feature analysis and precision scores for feedback item.">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
             --bg: #0f172a;
-            --surface: rgba(30, 41, 59, 0.7);
+            --glass: rgba(30, 41, 59, 0.7);
             --border: rgba(255, 255, 255, 0.1);
-            --text: #f8fafc;
-            --text-muted: #94a3b8;
-            --glass-bg: rgba(30, 41, 59, 0.8);
-            --glass-blur: blur(12px);
-            --success: #22c55e;
+            --primary: #38bdf8;
+            --text: #f1f5f9;
+            --text-dim: #94a3b8;
         }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
 
         body {
-            background-color: var(--bg);
-            background-image: 
-                radial-gradient(at 100% 100%, hsla(253,16%,7%,1) 0, transparent 50%), 
-                radial-gradient(at 0% 100%, hsla(225,39%,30%,1) 0, transparent 50%);
-            background-attachment: fixed;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
             color: var(--text);
-            min-height: 100vh;
+            margin: 0;
             padding: 2rem;
-        }
-
-        .container { max-width: 800px; margin: 0 auto; }
-
-        header {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
-            margin-bottom: 3rem;
         }
 
-        h1 {
-            font-size: 2rem;
-            background: linear-gradient(to right, #818cf8, #c084fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .container { max-width: 800px; width: 100%; }
 
-        .back-link {
-            text-decoration: none;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
+        h1 { margin-bottom: 2rem; }
 
-        .back-link:hover { color: var(--text); }
-
-        .card {
-            background: var(--glass-bg);
-            backdrop-filter: var(--glass-blur);
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
             border: 1px solid var(--border);
             border-radius: 1rem;
             padding: 2rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            margin-bottom: 2rem;
         }
 
-        .section-title {
-            font-size: 1.25rem;
-            margin-bottom: 1.5rem;
-            color: var(--text-muted);
-            font-weight: 500;
+        .label { color: var(--text-dim); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+        .value { font-size: 1.125rem; margin-bottom: 1.5rem; line-height: 1.6; }
+
+        .back-link {
+            color: var(--primary);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 2rem;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 1rem;
-        }
-
-        th {
-            text-align: left;
-            padding: 1rem;
-            color: var(--text-muted);
+        .feature-tag {
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 99px;
             font-size: 0.875rem;
-            text-transform: uppercase;
-            border-bottom: 1px solid var(--border);
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
         }
-
-        td { padding: 1rem; border-bottom: 1px solid var(--border); }
-
-        .precision-bar-container {
-            width: 100%;
-            height: 8px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 4px;
-        }
-
-        .precision-bar {
-            height: 100%;
-            background: var(--primary);
-            border-radius: 4px;
-        }
-
-        .error-message {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-            padding: 1.5rem;
-            border-radius: 0.5rem;
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            text-align: center;
-            margin-top: 2rem;
-        }
-
-        .loading-state {
-            text-align: center;
-            padding: 4rem;
-            color: var(--text-muted);
-        }
-
-        @keyframes pulse {
-            0% { opacity: 0.5; }
-            50% { opacity: 1; }
-            100% { opacity: 0.5; }
-        }
-
-        .loading-state span { animation: pulse 1.5s infinite; }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1 id="feedbackTitle">Feedback Details</h1>
-            <a href="index.html" class="back-link">← Back to Dashboard</a>
-        </header>
+        <a href="index.html" class="back-link">← Back to Dashboard</a>
+        <h1>Feedback Analysis</h1>
 
-        <main id="mainContent">
-            <div class="loading-state"><span>Analyzing feedback details...</span></div>
-        </main>
+        <div id="loading">Loading details...</div>
+
+        <div id="details-content" style="display: none;">
+            <div class="glass-panel">
+                <div class="label">Original Content</div>
+                <div class="value" id="content"></div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div>
+                        <div class="label">Status</div>
+                        <div class="value" id="status"></div>
+                    </div>
+                    <div>
+                        <div class="label">Sentiment</div>
+                        <div class="value" id="sentiment"></div>
+                    </div>
+                </div>
+
+                <div class="label">Canonical Group</div>
+                <div class="value" id="group"></div>
+            </div>
+
+            <div class="glass-panel">
+                <div class="label">Actionable Insight</div>
+                <div class="value" id="insight"></div>
+
+                <div class="label">Detected Feature Requests</div>
+                <div id="features" class="value"></div>
+            </div>
+
+            <div class="glass-panel">
+                <div class="label">Raw AI Response</div>
+                <pre id="raw" style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem; overflow-x: auto; font-size: 0.875rem;"></pre>
+            </div>
+        </div>
     </div>
 
     <script>
-        const API_BASE = 'http://localhost:3000';
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
 
-        async function fetchDetails() {
-            const params = new URLSearchParams(window.location.search);
-            const id = params.get('id');
-            const mainContent = document.getElementById('mainContent');
-            const feedbackTitle = document.getElementById('feedbackTitle');
-
-            if (!id) {
-                renderError('Missing Feedback ID. Please return to the dashboard.');
-                return;
-            }
-
-            feedbackTitle.textContent = `Feedback #${id}`;
-
+        async function loadDetails() {
+            if (!id) return;
             try {
-                const res = await fetch(`${API_BASE}/feedback/${id}`);
-                if (!res.ok) throw new Error('Could not fetch details for this feedback item.');
+                const res = await fetch(\`/feedback/\${id}\`);
+                if (!res.ok) throw new Error('Not found');
+                const item = await res.json();
+
+                document.getElementById('content').textContent = item.content;
+                document.getElementById('status').textContent = item.status;
                 
-                const details = await res.json();
-                renderDetails(details);
-            } catch (err) {
-                renderError(err.message);
+                const analysis = item.analysis_json;
+                if (analysis) {
+                    document.getElementById('sentiment').textContent = analysis.sentiment;
+                    document.getElementById('group').textContent = item.group_label || analysis.canonical_group_label;
+                    document.getElementById('insight').textContent = analysis.actionable_insight;
+                    
+                    const featuresDiv = document.getElementById('features');
+                    featuresDiv.innerHTML = '';
+                    analysis.feature_requests.forEach(f => {
+                        const span = document.createElement('span');
+                        span.className = 'feature-tag';
+                        span.textContent = \`\${f.title} (conf: \${Math.round(f.confidence * 100)}%)\`;
+                        featuresDiv.appendChild(span);
+                    });
+                } else {
+                    document.getElementById('sentiment').textContent = 'Pending...';
+                    document.getElementById('group').textContent = 'Pending...';
+                    document.getElementById('insight').textContent = 'Pending...';
+                    document.getElementById('features').textContent = 'None yet.';
+                }
+
+                document.getElementById('raw').textContent = item.raw_ai_response || 'No response yet.';
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('details-content').style.display = 'block';
+            } catch (e) {
+                document.getElementById('loading').textContent = 'Error loading feedback: ' + e.message;
             }
         }
 
-        function renderDetails(details) {
-            const mainContent = document.getElementById('mainContent');
-            
-            if (!details || details.length === 0) {
-                mainContent.innerHTML = `
-                    <div class="card">
-                        <p class="section-title">No analysis features found for this item.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            const card = document.createElement('div');
-            card.className = 'card';
-            
-            const title = document.createElement('p');
-            title.className = 'section-title';
-            title.textContent = 'Feature Breakdown & Precision';
-            card.appendChild(title);
-
-            const table = document.createElement('table');
-            const thead = document.createElement('thead');
-            thead.innerHTML = `
-                <tr>
-                    <th>Feature</th>
-                    <th>Precision score</th>
-                </tr>
-            `;
-            table.appendChild(thead);
-
-            const tbody = document.createElement('tbody');
-            details.forEach(item => {
-                const tr = document.createElement('tr');
-                const percentage = (item.precision * 100).toFixed(1);
-
-                const tdFeature = document.createElement('td');
-                tdFeature.style.fontWeight = '500';
-                tdFeature.textContent = item.feature;
-                tr.appendChild(tdFeature);
-
-                const tdPrecision = document.createElement('td');
-                tdPrecision.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                        <span>${percentage}%</span>
-                    </div>
-                    <div class="precision-bar-container">
-                        <div class="precision-bar" style="width: ${percentage}%"></div>
-                    </div>
-                `;
-                tr.appendChild(tdPrecision);
-                tbody.appendChild(tr);
-            });
-            table.appendChild(tbody);
-            card.appendChild(table);
-
-            mainContent.innerHTML = '';
-            mainContent.appendChild(card);
-        }
-
-        function renderError(msg) {
-            const mainContent = document.getElementById('mainContent');
-            mainContent.innerHTML = `
-                <div class="error-message">
-                    <p><strong>Error:</strong> ${msg}</p>
-                </div>
-            `;
-        }
-
-        function escapeHTML(str) {
-            if (!str) return '';
-            const div = document.createElement('div');
-            div.textContent = str;
-            return div.innerHTML;
-        }
-
-        document.addEventListener('DOMContentLoaded', fetchDetails);
+        window.onload = loadDetails;
     </script>
 </body>
 </html>

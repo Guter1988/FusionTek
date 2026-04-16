@@ -1,13 +1,27 @@
 import dotenv from 'dotenv';
-import path from 'path';
+import { z } from 'zod';
 
 dotenv.config();
 
 export const config = {
-  port: parseInt(process.env.PORT || '3000', 10),
+  port: parseInt(process.env.PORT || '3000'),
   databaseUrl: process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/feedback_db',
-  nodeEnv: process.env.NODE_ENV || 'development',
-  publicDir: path.join(process.cwd(), 'public'),
-  llmModel: process.env.LLM_MODEL || 'llama3.1',
-  llmApiUrl: process.env.LLM_API_URL || 'http://localhost:11434/v1',
+  ollamaUrl: process.env.OLLAMA_URL || 'http://localhost:11434',
+  modelName: process.env.MODEL_NAME || 'llama3.1',
+  workerInterval: parseInt(process.env.WORKER_INTERVAL || '1000'),
+  staleTimeoutMs: parseInt(process.env.STALE_TIMEOUT_MS || '60000'),
+  maxRetries: parseInt(process.env.MAX_RETRIES || '5'),
 };
+
+// Config validation for interview-readiness
+const configSchema = z.object({
+  port: z.number(),
+  databaseUrl: z.string().url(),
+  ollamaUrl: z.string().url(),
+  modelName: z.string(),
+  workerInterval: z.number().min(500),
+  staleTimeoutMs: z.number().min(10000),
+  maxRetries: z.number().min(0),
+});
+
+configSchema.parse(config);

@@ -12,7 +12,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./init-db:/docker-entrypoint-initdb.d
+      - ./sql:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d feedback_db"]
       interval: 10s
@@ -28,9 +28,9 @@ services:
     environment:
       PORT: 3000
       DATABASE_URL: postgres://postgres:postgres@db:5432/feedback_db
+      OLLAMA_URL: http://ollama:11434
+      MODEL_NAME: llama3.1
       NODE_ENV: production
-      LLM_MODEL: llama3.1
-      LLM_API_URL: http://ollama:11434/v1
     depends_on:
       db:
         condition: service_healthy

@@ -1,34 +1,47 @@
-import Fastify from 'fastify';
+import fastify from 'fastify';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import fastifyStatic from '@fastify/static';
 import fastifyWebsocket from '@fastify/websocket';
-import { config } from './config.js';
 import { feedbackRoutes } from './routes/feedback.js';
-import { pageRoutes } from './routes/pages.js';
-import { registerWebSocketHandler } from './ws.js';
+import { groupRoutes } from './routes/groups.js';
+import { healthRoutes } from './routes/health.js';
+import { WebsocketHub } from './ws/websocketHub.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export async function buildApp() {
-  const app = Fastify({
-    logger: config.nodeEnv === 'development',
-  });
+  const app = fastify({ logger: true });
 
-  // Register plugins
-  await app.register(fastifyStatic, {
-    root: config.publicDir,
-    // Enable this to serve files directly from root (e.g. /index.html)
-    // while also allowing manual sendFile usage in routes.
-    decorateReply: true,
-  });
-
+  // Plugins
   await app.register(fastifyWebsocket);
+  await app.register(fastifyStatic, {
+    root: path.join(__dirname, '../public'),
+    prefix: '/',
+  });
 
-  // Register WebSocket
-  registerWebSocketHandler(app);
+  // Websocket
+  app.get('/ws', { websocket: true }, (connection, req) => {
+    WebsocketHub.getInstance().addClient(connection.socket);
+    console.log('New WS connection established');
+  });
 
-  // Register API routes
+  // Routes
   await app.register(feedbackRoutes);
+  await app.register(groupRoutes);
+  await app.register(healthRoutes);
 
-  // Register Page routes
-  await app.register(pageRoutes);
+  // Global error handler for Zod
+  app.setErrorHandler((error, request, reply) => {
+    if (error.name === 'ZodError') {
+      return reply.status(400).send({
+        error: 'Validation failed',
+        details: (error as any).errors,
+      });
+    }
+    reply.send(error);
+  });
 
   return app;
 }

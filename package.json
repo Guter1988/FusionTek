@@ -8,7 +8,7 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "seed:samples": "tsx src/seed.ts",
+    "seed:samples": "tsx scripts/seedSamples.ts",
     "test": "vitest run"
   },
   "dependencies": {
@@ -16,14 +16,14 @@
     "@fastify/websocket": "^10.0.0",
     "dotenv": "^16.4.0",
     "fastify": "^4.26.0",
-    "openai": "^6.34.0",
     "pg": "^8.11.0",
-    "xss": "^1.0.15",
+    "ws": "^8.16.0",
     "zod": "^3.22.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
     "@types/pg": "^8.11.0",
+    "@types/ws": "^8.5.10",
     "tsx": "^4.7.0",
     "typescript": "^5.3.0",
     "vitest": "^4.1.4"
