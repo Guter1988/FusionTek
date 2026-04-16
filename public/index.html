@@ -400,7 +400,10 @@
                     body: JSON.stringify({ text })
                 });
 
-                if (!res.ok) throw new Error('Failed to submit feedback');
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.error || 'Failed to submit feedback');
+                }
                 
                 const responseData = await res.json();
                 
@@ -417,7 +420,7 @@
                 showNotification('Feedback submitted successfully');
             } catch (err) {
                 console.error(err);
-                showNotification('Error submitting feedback');
+                alert(`Error: ${err.message}`);
                 dom.btnSubmit.disabled = false;
             } finally {
                 dom.spinner.style.display = 'none';

@@ -2,6 +2,9 @@ import { FastifyInstance } from 'fastify';
 import { db } from '../db.js';
 import { broadcastFeedbackUpdate } from '../ws.js';
 import { analyzeFeedbackAsync } from '../ai.js';
+import xss from 'xss';
+// Use the default export if available, otherwise use the package itself
+const filterXSS = (xss as any).default || xss;
 
 interface FeedbackBody {
   text: string;
@@ -16,6 +19,12 @@ export async function feedbackRoutes(app: FastifyInstance) {
       return reply.code(400).send({ error: 'Text is required' });
     }
 
+    // Check for HTML/JS injection - using empty whiteList to reject all tags
+    const sanitized = filterXSS(text, { whiteList: {} });
+    if (sanitized !== text) {
+      return reply.code(400).send({ error: 'Security Warning: HTML/JS injection or forbidden tags detected in feedback.' });
+    }
+
     const result = await db.query(
       'INSERT INTO feedback (text, status) VALUES ($1, $2) RETURNING *',
       [text, 'RECEIVED']
@@ -23,10 +32,7 @@ export async function feedbackRoutes(app: FastifyInstance) {
 
     const feedback = result.rows[0];
 
-    // Trigger AI analysis asynchronously
-    analyzeFeedbackAsync(feedback.id, text).catch(err => {
-      console.error('Initial analysis trigger failed:', err);
-    });
+
 
     // Return mapped object to match required response format
     return {

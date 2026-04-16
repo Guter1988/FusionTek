@@ -10,6 +10,11 @@ CREATE TABLE IF NOT EXISTS feedback (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
     
+    -- Retry logic and AI response storage
+    retry_count INT DEFAULT 0 NOT NULL,
+    raw_ai_response TEXT,
+    analysis_json JSONB,
+
     -- Constraint for status validation
     CONSTRAINT check_status CHECK (status IN ('RECEIVED', 'ANALYZING', 'DONE', 'FAILED'))
 );

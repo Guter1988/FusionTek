@@ -46,11 +46,7 @@ Constraints:
 
 export async function analyzeFeedbackAsync(feedbackId: number, text: string) {
   try {
-    // 1. Update status to ANALYZING
-    await db.query('UPDATE feedback SET status = $1 WHERE id = $2', ['ANALYZING', feedbackId]);
-    broadcastFeedbackUpdate({ id: feedbackId, status: 'ANALYZING' });
-
-    // 2. Call local LLM
+    // 1. Call local LLM
     const response = await openai.chat.completions.create({
       model: config.llmModel,
       messages: [
@@ -64,7 +60,7 @@ export async function analyzeFeedbackAsync(feedbackId: number, text: string) {
     const content = response.choices[0]?.message?.content;
     if (!content) throw new Error('Empty AI response');
 
-    // 3. Parse and Validate
+    // 2. Parse and Validate
     let parsed: AnalysisResult;
     try {
       const cleanedContent = content.trim();
@@ -74,11 +70,21 @@ export async function analyzeFeedbackAsync(feedbackId: number, text: string) {
       throw new Error('Invalid AI response format');
     }
 
-    // 4. Save results to DB
+    // 3. Save results to DB
     await db.query(
-      'UPDATE feedback SET sentiment = $1, feature_group = $2, status = $3 WHERE id = $4',
-      [parsed.sentiment, parsed.primary_feature_group, 'DONE', feedbackId]
+      `UPDATE feedback SET 
+        sentiment = $1, 
+        feature_group = $2, 
+        status = $3, 
+        raw_ai_response = $4, 
+        analysis_json = $5,
+        updated_at = NOW()
+      WHERE id = $6`,
+      [parsed.sentiment, parsed.primary_feature_group, 'DONE', content, JSON.stringify(parsed), feedbackId]
     );
+
+    // Clear old features if retrying
+    await db.query('DELETE FROM features WHERE feedback_id = $1', [feedbackId]);
 
     // Insert individual features
     for (const feat of parsed.feature_requests) {
@@ -88,7 +94,7 @@ export async function analyzeFeedbackAsync(feedbackId: number, text: string) {
       );
     }
 
-    // 5. Broadcast update
+    // 4. Broadcast update
     broadcastFeedbackUpdate({
       id: feedbackId,
       status: 'DONE',
@@ -98,9 +104,8 @@ export async function analyzeFeedbackAsync(feedbackId: number, text: string) {
 
   } catch (error) {
     console.error(`Feedback analysis failed for ID ${feedbackId}:`, error);
-    
-    // 6. Fail Safely
-    await db.query('UPDATE feedback SET status = $1 WHERE id = $2', ['FAILED', feedbackId]);
-    broadcastFeedbackUpdate({ id: feedbackId, status: 'FAILED' });
+    // Note: We do NOT update status to FAILED here. 
+    // The background worker will handle retries and eventual failure after 5 attempts.
+    throw error; 
   }
 }
