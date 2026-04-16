@@ -1,7 +1,7 @@
-import { SocketStream } from '@fastify/websocket';
 import { FastifyInstance } from 'fastify';
 
-const connections = new Set<SocketStream>();
+// Temporarily using any for the connection type to resolve export mismatch in v10
+const connections = new Set<any>();
 
 export function registerWebSocketHandler(app: FastifyInstance) {
   app.get('/ws', { websocket: true }, (connection, req) => {
@@ -11,7 +11,7 @@ export function registerWebSocketHandler(app: FastifyInstance) {
       connections.delete(connection);
     });
 
-    connection.socket.on('error', (err) => {
+    connection.socket.on('error', (err: Error) => {
       console.error('WebSocket error:', err);
       connections.delete(connection);
     });
@@ -29,7 +29,7 @@ export function broadcastFeedbackUpdate(update: {
     if (connection.socket.readyState === 1) { // 1 = OPEN
       try {
         connection.socket.send(message);
-      } catch (err) {
+      } catch (err: any) {
         console.error('Failed to send WS message:', err);
         connections.delete(connection);
       }
