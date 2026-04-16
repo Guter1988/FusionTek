@@ -28,13 +28,25 @@ FusionTek provides a complete system for capturing, analyzing, and monitoring us
 - Docker & Docker Compose
 
 ### 2. Run Everything
-The entire stack (Frontend + Backend + Database) is containerized. Simply run:
+We provide convenient scripts to start the environment and open the browser automatically:
+
+**On Windows (CMD):**
+```cmd
+runme.cmd
+```
+
+**On Bash (Linux/macOS/Git Bash):**
 ```bash
-docker-compose up --build
+./runme.sh
+```
+
+Alternatively, you can run manually:
+```bash
+docker compose up -d
 ```
 
 ### 3. Access the App
-Open your browser at:
+The scripts above will open your browser automatically. If you run manually, access:
 - Dashboard: [http://localhost:3000/](http://localhost:3000/)
 - Feedback Details: [http://localhost:3000/feedback.html](http://localhost:3000/feedback.html)
 
@@ -55,3 +67,5 @@ Open your browser at:
 - **2026-04-16 21:43:20**: Configured environment variables and static file serving.
 - **2026-04-16 21:52:19**: Resolved TypeScript compilation issues in the WebSocket module to fix Docker build.
 - **2026-04-16 21:53:50**: Fixed runtime crash caused by duplicate `@fastify/static` plugin registration.
+- **2026-04-16 21:57:30**: Added automation scripts (`runme.sh` and `runme.cmd`) for quick startup and browser access.
+
