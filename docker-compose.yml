@@ -29,6 +29,29 @@ services:
       PORT: 3000
       DATABASE_URL: postgres://postgres:postgres@db:5432/feedback_db
       NODE_ENV: production
+      LLM_MODEL: llama3.1
+      LLM_API_URL: http://ollama:11434/v1
     depends_on:
       db:
         condition: service_healthy
+      ollama:
+        condition: service_started
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: fusiontek-ollama
+    restart: always
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+
+  ollama-init:
+    image: curlimages/curl:latest
+    container_name: fusiontek-ollama-init
+    depends_on:
+      - ollama
+    entrypoint: [ "sh", "-c", "sleep 5 && curl -X POST http://ollama:11434/api/pull -d '{\"name\": \"llama3.1\"}'" ]
+
+volumes:
+  ollama_data:

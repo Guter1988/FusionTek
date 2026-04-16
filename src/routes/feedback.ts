@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { db } from '../db.js';
 import { broadcastFeedbackUpdate } from '../ws.js';
+import { analyzeFeedbackAsync } from '../ai.js';
 
 interface FeedbackBody {
   text: string;
@@ -21,6 +22,11 @@ export async function feedbackRoutes(app: FastifyInstance) {
     );
 
     const feedback = result.rows[0];
+
+    // Trigger AI analysis asynchronously
+    analyzeFeedbackAsync(feedback.id, text).catch(err => {
+      console.error('Initial analysis trigger failed:', err);
+    });
 
     // Return mapped object to match required response format
     return {
