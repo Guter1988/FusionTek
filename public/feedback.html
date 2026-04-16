@@ -185,39 +185,51 @@
                 return;
             }
 
-            let tableRows = details.map(item => {
-                const percentage = (item.precision * 100).toFixed(1);
-                return `
-                    <tr>
-                        <td style="font-weight: 500;">${escapeHTML(item.feature)}</td>
-                        <td>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                                <span>${percentage}%</span>
-                            </div>
-                            <div class="precision-bar-container">
-                                <div class="precision-bar" style="width: ${percentage}%"></div>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+            const card = document.createElement('div');
+            card.className = 'card';
+            
+            const title = document.createElement('p');
+            title.className = 'section-title';
+            title.textContent = 'Feature Breakdown & Precision';
+            card.appendChild(title);
 
-            mainContent.innerHTML = `
-                <div class="card">
-                    <p class="section-title">Feature Breakdown & Precision</p>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Feature</th>
-                                <th>Precision score</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${tableRows}
-                        </tbody>
-                    </table>
-                </div>
+            const table = document.createElement('table');
+            const thead = document.createElement('thead');
+            thead.innerHTML = `
+                <tr>
+                    <th>Feature</th>
+                    <th>Precision score</th>
+                </tr>
             `;
+            table.appendChild(thead);
+
+            const tbody = document.createElement('tbody');
+            details.forEach(item => {
+                const tr = document.createElement('tr');
+                const percentage = (item.precision * 100).toFixed(1);
+
+                const tdFeature = document.createElement('td');
+                tdFeature.style.fontWeight = '500';
+                tdFeature.textContent = item.feature;
+                tr.appendChild(tdFeature);
+
+                const tdPrecision = document.createElement('td');
+                tdPrecision.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                        <span>${percentage}%</span>
+                    </div>
+                    <div class="precision-bar-container">
+                        <div class="precision-bar" style="width: ${percentage}%"></div>
+                    </div>
+                `;
+                tr.appendChild(tdPrecision);
+                tbody.appendChild(tr);
+            });
+            table.appendChild(tbody);
+            card.appendChild(table);
+
+            mainContent.innerHTML = '';
+            mainContent.appendChild(card);
         }
 
         function renderError(msg) {

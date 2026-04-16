@@ -24,7 +24,12 @@ describe('Feedback Routes Validation', () => {
     app = await buildApp();
   });
 
-  it('should return 400 if feedback contains script tags', async () => {
+  it('should accept feedback containing script tags (safe storage policy)', async () => {
+    const { db } = await import('../db.js');
+    (db.query as any).mockResolvedValueOnce({
+      rows: [{ id: 1, text: 'Hello <script>alert(1)</script>', status: 'RECEIVED' }]
+    });
+
     const response = await app.inject({
       method: 'POST',
       url: '/feedback',
@@ -33,37 +38,28 @@ describe('Feedback Routes Validation', () => {
       },
     });
 
-    expect(response.statusCode).toBe(400);
+    expect(response.statusCode).toBe(200);
     const body = JSON.parse(response.body);
-    expect(body.error).toContain('Security Warning');
+    expect(body.text).toBe('Hello <script>alert(1)</script>');
   });
 
-  it('should return 400 if feedback contains HTML tags like <div>', async () => {
+  it('should accept feedback containing HTML tags (safe storage policy)', async () => {
+    const { db } = await import('../db.js');
+    (db.query as any).mockResolvedValueOnce({
+      rows: [{ id: 1, text: 'Hello <div>content</div>', status: 'RECEIVED' }]
+    });
+
     const response = await app.inject({
       method: 'POST',
       url: '/feedback',
       payload: {
-        text: 'Hello <div>malicious content</div>',
+        text: 'Hello <div>content</div>',
       },
     });
 
-    expect(response.statusCode).toBe(400);
+    expect(response.statusCode).toBe(200);
     const body = JSON.parse(response.body);
-    expect(body.error).toContain('Security Warning');
-  });
-
-  it('should return 400 if feedback contains event handlers like onclick', async () => {
-    const response = await app.inject({
-      method: 'POST',
-      url: '/feedback',
-      payload: {
-        text: 'Clean text <img src=x onerror=alert(1)>',
-      },
-    });
-
-    expect(response.statusCode).toBe(400);
-    const body = JSON.parse(response.body);
-    expect(body.error).toContain('Security Warning');
+    expect(body.text).toBe('Hello <div>content</div>');
   });
 
   it('should return 200 for clean feedback text', async () => {

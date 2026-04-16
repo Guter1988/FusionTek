@@ -349,18 +349,61 @@
             
             const statusClass = `status-${(item.status || 'pending').toLowerCase()}`;
             
-            tr.innerHTML = `
-                <td>${item.id}</td>
-                <td><div style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHTML(item.text)}">${escapeHTML(item.text)}</div></td>
-                <td><span class="status-badge ${statusClass}">${escapeHTML(item.status || 'pending')}</span></td>
-                <td class="sentiment-tag">${escapeHTML(item.sentiment || '-')}</td>
-                <td>${escapeHTML(item.group || '-')}</td>
-                <td>${formatDate(item.created_at)}</td>
-                <td>${formatDate(item.updated_at)}</td>
-                <td>
-                    <button class="btn-details" onclick="location.href='feedback.html?id=${item.id}'">Details</button>
-                </td>
-            `;
+            // ID Cell
+            const tdId = document.createElement('td');
+            tdId.textContent = item.id;
+            tr.appendChild(tdId);
+
+            // Text Cell (Unicode safe via textContent)
+            const tdText = document.createElement('td');
+            const textDiv = document.createElement('div');
+            textDiv.style.maxWidth = '300px';
+            textDiv.style.overflow = 'hidden';
+            textDiv.style.textOverflow = 'ellipsis';
+            textDiv.style.whiteSpace = 'nowrap';
+            textDiv.textContent = item.text;
+            textDiv.title = item.text;
+            tdText.appendChild(textDiv);
+            tr.appendChild(tdText);
+
+            // Status Cell
+            const tdStatus = document.createElement('td');
+            const statusBadge = document.createElement('span');
+            statusBadge.className = `status-badge ${statusClass}`;
+            statusBadge.textContent = item.status || 'pending';
+            tdStatus.appendChild(statusBadge);
+            tr.appendChild(tdStatus);
+
+            // Sentiment Cell
+            const tdSentiment = document.createElement('td');
+            tdSentiment.className = 'sentiment-tag';
+            tdSentiment.textContent = item.sentiment || '-';
+            tr.appendChild(tdSentiment);
+
+            // Group Cell
+            const tdGroup = document.createElement('td');
+            tdGroup.textContent = item.group || '-';
+            tr.appendChild(tdGroup);
+
+            // Created At
+            const tdCreated = document.createElement('td');
+            tdCreated.textContent = formatDate(item.created_at);
+            tr.appendChild(tdCreated);
+
+            // Updated At
+            const tdUpdated = document.createElement('td');
+            tdUpdated.textContent = formatDate(item.updated_at);
+            tr.appendChild(tdUpdated);
+
+            // Actions
+            const tdActions = document.createElement('td');
+            const btnDetails = document.createElement('button');
+            btnDetails.className = 'btn-details';
+            btnDetails.textContent = 'Details';
+            btnDetails.onclick = () => { location.href = `feedback.html?id=${item.id}`; };
+            tdActions.appendChild(btnDetails);
+            tr.appendChild(tdActions);
+
             return tr;
         }
 

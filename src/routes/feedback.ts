@@ -19,8 +19,12 @@ export async function feedbackRoutes(app: FastifyInstance) {
       return reply.code(400).send({ error: 'Text is required' });
     }
 
-    // We store the raw text. Robustness is handled by safe rendering in the UI
-    // and structured prompting in the AI worker.
+    // Security Policy: We do NOT block malicious-looking text (XSS/SQLi) at the ingest level.
+    // This supports adversarial testing and research. Safety is guaranteed by:
+    // 1. Safe rendering in the UI (using textContent).
+    // 2. Parameterized queries in the DB.
+    // 3. Prompt boundaries in the AI worker.
+    console.log(`[Unicode Verify] Received text: "${text}" (length: ${text.length})`);
 
     const result = await db.query(
       'INSERT INTO feedback (text, status) VALUES ($1, $2) RETURNING *',

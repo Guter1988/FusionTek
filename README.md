@@ -71,6 +71,37 @@ The scripts above will open your browser automatically. If you run manually, acc
 | `/feedback/:id` | `GET` | Get detailed feature analysis for an ID |
 | `/ws` | `WS` | Real-time update stream |
 
+## Unicode & Multi-Locale Support
+
+The FusionTek platform is fully compatible with Unicode (UTF-8) across the entire stack, ensuring that users can submit feedback in any language or script (Hebrew, Arabic, Japanese, Chinese, Russian, Hindi, Emojis, etc.).
+
+### How it works:
+1.  **Frontend**: All HTML pages use `<meta charset="UTF-8">`. UI updates are performed using `textContent` to ensure that Unicode strings are rendered safely and accurately without corrupting special characters or triggering accidental HTML parsing.
+2.  **Backend**: The Fastify server handles `application/json` request bodies using UTF-8 encoding by default. The `pg` library manages database communication using UTF-8, preserving the original strings.
+3.  **Database**: The PostgreSQL database is configured with `UTF8` encoding. The `text` column type in the `feedback` table is used to store high-fidelity Unicode content.
+
+### End-to-End Verification
+Unicode support has been verified end-to-end using the following languages and mixed scripts:
+- **Hebrew**: שלום עולם
+- **Arabic**: مرحبا بالعالم
+- **Japanese**: こんにちは世界
+- **Chinese**: 你好，世界
+- **Russian**: Привет мир
+- **Hindi**: नमस्ते दुनिया
+- **Emoji**: 🚀🔥😊
+- **Mixed**: שלום world こんにちは 🚀
+
+#### SQL Verification Query
+To verify your database encoding, run:
+```sql
+SELECT datname, pg_encoding_to_char(encoding) as encoding, datcollate, datctype 
+FROM pg_database 
+WHERE datname = 'feedback_db';
+```
+
+#### Automated Verification
+A verification script is available in `scripts/verify-unicode.ts`. It performs an end-to-end round-trip test (Submit -> API -> DB -> Fetch) to ensure character integrity.
+
 ## Security & Robustness
 The system implements a multi-layered approach to security and robustness:
 - **Safe Rendering**: All feedback text is rendered using `.textContent` or manual HTML escaping on the frontend. This ensures that HTML/JS payloads (like `<script>` or `<img>` onerror) are displayed as literal text and never executed.
@@ -90,6 +121,8 @@ The system implements a multi-layered approach to security and robustness:
 - **2026-04-16 22:27**: Integrated 120+ sample feedback items (general, security, and injection).
 - **2026-04-16 22:28**: Replaced strict input blocking with safe rendering to support adversarial testing.
 - **2026-04-16 22:29**: Improved AI prompt robustness to handle prompt injection attempts.
+- **2026-04-16 22:48**: Verified and fixed end-to-end Unicode support (HTML, API, DB).
+- **2026-04-16 22:49**: Refactored frontend to use `textContent` for safe, high-fidelity script rendering.
 
 ## Sample Data & Seeding
 The project includes a structured set of sample data to demonstrate system capabilities:
