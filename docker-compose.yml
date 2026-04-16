@@ -2,19 +2,33 @@ version: '3.8'
 
 services:
   db:
-    image: postgres:latest
-    container_name: fusiontek-postgres
+    image: postgres:15-alpine
+    container_name: fusiontek-db
     restart: always
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-admin}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password123}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-feedback_db}
     ports:
       - "5432:5432"
     volumes:
       - ./init-db:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-admin} -d $${POSTGRES_DB:-feedback_db}"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d feedback_db"]
       interval: 10s
       timeout: 5s
       retries: 5
+
+  api:
+    build: .
+    container_name: fusiontek-api
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgres://postgres:postgres@db:5432/feedback_db
+      NODE_ENV: production
+    depends_on:
+      db:
+        condition: service_healthy

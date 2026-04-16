@@ -25,24 +25,15 @@ FusionTek provides a complete system for capturing, analyzing, and monitoring us
 ## Quick Start
 
 ### 1. Prerequisites
-- Node.js (v20+)
 - Docker & Docker Compose
 
-### 2. Database Setup
-Start the PostgreSQL container:
+### 2. Run Everything
+The entire stack (Frontend + Backend + Database) is containerized. Simply run:
 ```bash
-docker-compose up -d
+docker-compose up --build
 ```
 
-### 3. Backend Setup
-Install dependencies and configure the environment:
-```bash
-npm install
-cp .env.example .env
-npm run dev
-```
-
-### 4. Access the App
+### 3. Access the App
 Open your browser at:
 - Dashboard: [http://localhost:3000/](http://localhost:3000/)
 - Feedback Details: [http://localhost:3000/feedback.html](http://localhost:3000/feedback.html)
