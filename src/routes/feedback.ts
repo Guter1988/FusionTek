@@ -19,11 +19,8 @@ export async function feedbackRoutes(app: FastifyInstance) {
       return reply.code(400).send({ error: 'Text is required' });
     }
 
-    // Check for HTML/JS injection - using empty whiteList to reject all tags
-    const sanitized = filterXSS(text, { whiteList: {} });
-    if (sanitized !== text) {
-      return reply.code(400).send({ error: 'Security Warning: HTML/JS injection or forbidden tags detected in feedback.' });
-    }
+    // We store the raw text. Robustness is handled by safe rendering in the UI
+    // and structured prompting in the AI worker.
 
     const result = await db.query(
       'INSERT INTO feedback (text, status) VALUES ($1, $2) RETURNING *',

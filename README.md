@@ -9,7 +9,8 @@ FusionTek provides a complete system for capturing, analyzing, and monitoring us
 - **Frontend**: Premium "Glassmorphism" UI built with vanilla HTML, CSS, and JS.
 - **Database**: PostgreSQL 15+ containerized with Docker Compose.
 - **Real-time**: Live updates via WebSockets for feedback status and sentiment changes.
-- **Security**: Built-in protection against HTML/JS injection (XSS) using strict sanitization.
+- **Security**: Robust protection against HTML/JS injection (XSS) via safe rendering and structured AI prompting.
+- **Sample Data**: Built-in seeding system with 120+ diverse feedback samples for testing and demos.
 - **Testing**: Integrated test suite for API validation and core logic.
 
 ## System Architecture
@@ -70,10 +71,12 @@ The scripts above will open your browser automatically. If you run manually, acc
 | `/feedback/:id` | `GET` | Get detailed feature analysis for an ID |
 | `/ws` | `WS` | Real-time update stream |
 
-## Security & Validation
-The system implements strict input validation:
-- **XSS Protection**: Every submission is checked using a zero-trust policy. If any HTML tags or event handlers (like `<script>`, `<div>`, `onclick`) are detected, the request is rejected with a **400 Bad Request**.
-- **Schema Validation**: All AI outputs are validated using **Zod** before being stored in the database.
+## Security & Robustness
+The system implements a multi-layered approach to security and robustness:
+- **Safe Rendering**: All feedback text is rendered using `.textContent` or manual HTML escaping on the frontend. This ensures that HTML/JS payloads (like `<script>` or `<img>` onerror) are displayed as literal text and never executed.
+- **Structured Prompting**: User feedback is treated as untrusted data. When sending to the AI, it is wrapped in clear boundaries and the system prompt explicitly instructs the LLM to ignore any instructions within the feedback (defending against prompt injection).
+- **Data Integrity**: Adversarial samples (SQL injection text, PII) are stored safely as strings in PostgreSQL without risk of execution or leakage.
+- **Schema Validation**: All AI outputs are validated using **Zod** before being stored.
 
 ## Development Log
 - **2026-04-16 20:02**: Initialized PostgreSQL setup using Docker Compose.
@@ -84,6 +87,29 @@ The system implements strict input validation:
 - **2026-04-16 22:03**: Implemented strict JSON extraction with Zod validation.
 - **2026-04-16 22:20**: Added background worker with polling-based retry logic.
 - **2026-04-16 22:22**: Implemented XSS protection using the `xss` library and added Vitest suite.
+- **2026-04-16 22:27**: Integrated 120+ sample feedback items (general, security, and injection).
+- **2026-04-16 22:28**: Replaced strict input blocking with safe rendering to support adversarial testing.
+- **2026-04-16 22:29**: Improved AI prompt robustness to handle prompt injection attempts.
+
+## Sample Data & Seeding
+The project includes a structured set of sample data to demonstrate system capabilities:
+- **General (100 samples)**: Positive, negative, feature requests, and multilingual inputs (French, Spanish, German, Japanese, Hebrew).
+- **Security Risks (10 samples)**: Prompt injection attempts, SQL injection text, and PII leakage examples.
+- **Injection Payloads (10 samples)**: HTML and JavaScript payloads to verify safe rendering.
+
+### Seeding the Database
+To populate your local database with these samples:
+```bash
+npm run seed:samples
+```
+*Note: The script is idempotent; it checks for existing text before inserting to avoid duplicates.*
+
+## AI Collaboration Log - Decisions & Rationale
+| Date | Decision | Rationale |
+| :--- | :--- | :--- |
+| 2026-04-16 | **Safe Rendering > Input Blocking** | To support adversarial testing and research, we transitioned from blocking suspicious strings (like `<script>`) to safe, escaped rendering. This allows the system to process "malicious-looking" feedback while remaining perfectly secure. |
+| 2026-04-16 | **Prompt Boundaries** | Added explicit `--- FEEDBACK START ---` markers and system-level instructions to treat user input as raw data, mitigating "ignore previous instructions" attacks. |
+| 2026-04-16 | **Rejected Suggestion** | **AI Suggestion**: "We should use a Regex to block all inputs containing 'SELECT' or 'DROP TABLE'."<br>**Resolution**: Rejected. Simple keyword blocking is fragile and prevents users from writing feedback *about* SQL-related issues. Instead, we use parameterized queries and safe rendering. |
 
 ## Background Processing & Retry Strategy
 
