@@ -26,9 +26,10 @@ The application features a modern "Glassmorphism" interface:
 3. Ensure the backend server is listening on port 3000 for API and WS connections.
 
 ## Development Log
-- **2026-04-16**: Initialized PostgreSQL setup using Docker Compose.
-- **2026-04-16**: Designed SQL schema with `feedback` and `features` tables using `GENERATED ALWAYS AS IDENTITY`.
-- **2026-04-16**: Implemented automated `updated_at` triggers and set default values to `NOW()`.
-- **2026-04-16**: Modified `docker-compose.yml` to remove persistent volumes (database resets on every deployment).
-- **2026-04-16**: Developed a modern vanilla JS frontend UI with real-time updates and detailed analysis views.
-- **2026-04-16**: Updated project documentation and synchronized repository.
+- **2026-04-16 18:02:22**: Initialized PostgreSQL setup using Docker Compose.
+- **2026-04-16 18:11:10**: Designed SQL schema with `feedback` and `features` tables using `GENERATED ALWAYS AS IDENTITY`.
+- **2026-04-16 18:15:30**: Implemented automated `updated_at` triggers and set default values to `NOW()`.
+- **2026-04-16 18:22:15**: Modified `docker-compose.yml` to remove persistent volumes (database resets on every deployment).
+- **2026-04-16 21:22:19**: Developed a modern vanilla JS frontend UI with real-time updates and detailed analysis views.
+- **2026-04-16 21:27:14**: Updated project documentation and synchronized repository.
+- **2026-04-16 21:35:45**: Refined README timestamps to include precise hour, minute, and second formatting.
