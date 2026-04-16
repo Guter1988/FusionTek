@@ -1,35 +1,64 @@
-# FusionTek
-FusionTek interview project for feedback analysis database setup and frontend UI.
+# FusionTek - Feedback Analysis Platform
+
+A full-stack feedback analysis application with a real-time analytics dashboard.
 
 ## Project Overview
-This repository contains a containerized PostgreSQL environment with an automated schema initialization and a modern vanilla JavaScript frontend for a feedback analysis application.
+FusionTek provides a complete system for capturing, analyzing, and monitoring user feedback. This repository includes:
+- **Backend**: High-performance Node.js server using Fastify and TypeScript.
+- **Frontend**: Premium "Glassmorphism" UI built with vanilla HTML, CSS, and JS.
+- **Database**: PostgreSQL 15+ containerized with Docker Compose.
+- **Real-time**: Live updates via WebSockets for feedback status and sentiment changes.
 
 ## System Architecture
-- **Backend (Mocked)**: Expected to run on `http://localhost:3000`.
-- **Database**: PostgreSQL 15+ in Docker.
-- **Frontend**: Vanilla HTML/CSS/JS with real-time WebSocket updates.
+- **API Server**: Fastify (listening on port 3000).
+- **Database**: PostgreSQL (accessible via `db:5432` in Docker or `localhost:5432` locally).
+- **Communication**: REST API for data operations + WebSockets for live dashboard updates.
 
-## Frontend UI
-The application features a modern "Glassmorphism" interface:
-- **Dashboard (`index.html`)**: Submit feedback and view an auto-updating list of all entries. Includes real-time updates via WebSockets for state changes (sentiment, grouping).
-- **Details View (`feedback.html`)**: Deep-dive into specific feedback items to see feature breakdown and precision scores.
+## Tech Stack
+- **Languages**: TypeScript, JavaScript (ESM)
+- **Framework**: Fastify
+- **Database**: PostgreSQL with `pg` pool
+- **Real-time**: `@fastify/websocket`
+- **Styling**: Vanilla CSS (Custom Properties, Flexbox, Grid, Glassmorphism)
+- **Infrastructure**: Docker, Docker Compose
 
-### Technologies
-- Plain HTML5 & Semantic Elements
-- Vanilla CSS3 (Custom Properties, Flexbox, Grid, Glassmorphism)
-- Vanilla JavaScript (Fetch API, WebSocket, DOM API)
-- Responsive Design for mobile/desktop support
+## Quick Start
 
-### How to Run
-1. Start the database: `docker-compose up -d`
-2. Open `index.html` in your favorite web browser.
-3. Ensure the backend server is listening on port 3000 for API and WS connections.
+### 1. Prerequisites
+- Node.js (v20+)
+- Docker & Docker Compose
+
+### 2. Database Setup
+Start the PostgreSQL container:
+```bash
+docker-compose up -d
+```
+
+### 3. Backend Setup
+Install dependencies and configure the environment:
+```bash
+npm install
+cp .env.example .env
+npm run dev
+```
+
+### 4. Access the App
+Open your browser at:
+- Dashboard: [http://localhost:3000/](http://localhost:3000/)
+- Feedback Details: [http://localhost:3000/feedback.html](http://localhost:3000/feedback.html)
+
+## API Reference
+
+| Endpoint | Method | Description |
+| :--- | :--- | :--- |
+| `/feedback` | `POST` | Submit new feedback text |
+| `/feedbacks` | `GET` | List all feedback (sorted by newest) |
+| `/feedback/:id` | `GET` | Get detailed feature analysis for an ID |
+| `/ws` | `WS` | Real-time update stream |
 
 ## Development Log
 - **2026-04-16 20:02:22**: Initialized PostgreSQL setup using Docker Compose.
-- **2026-04-16 20:11:10**: Designed SQL schema with `feedback` and `features` tables using `GENERATED ALWAYS AS IDENTITY`.
-- **2026-04-16 20:15:30**: Implemented automated `updated_at` triggers and set default values to `NOW()`.
-- **2026-04-16 21:22:15**: Modified `docker-compose.yml` to remove persistent volumes (database resets on every deployment).
-- **2026-04-16 21:22:19**: Developed a modern vanilla JS frontend UI with real-time updates and detailed analysis views.
-- **2026-04-16 21:27:14**: Updated project documentation and synchronized repository.
-- **2026-04-16 21:35:45**: Refined README timestamps to include precise hour, minute, and second formatting.
+- **2026-04-16 20:11:10**: Designed SQL schema with `feedback` and `features` tables.
+- **2026-04-16 21:22:19**: Developed modern vanilla JS frontend with real-time updates.
+- **2026-04-16 21:36:57**: Implemented full Node.js backend using Fastify and TypeScript.
+- **2026-04-16 21:43:20**: Configured environment variables and static file serving.

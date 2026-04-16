@@ -3,7 +3,7 @@
 -- Table: feedback
 CREATE TABLE IF NOT EXISTS feedback (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    content TEXT NOT NULL,
+    text TEXT NOT NULL,
     status VARCHAR(20) NOT NULL,
     sentiment VARCHAR(50),
     feature_group VARCHAR(100),
@@ -32,7 +32,7 @@ CREATE TRIGGER update_feedback_updated_at
 CREATE TABLE IF NOT EXISTS features (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     feedback_id INTEGER NOT NULL,
-    feature_name VARCHAR(100) NOT NULL,
+    feature VARCHAR(100) NOT NULL,
     confidence DOUBLE PRECISION NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
